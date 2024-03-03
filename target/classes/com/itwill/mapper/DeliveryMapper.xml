@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.DeliveryMapper">
+	
+	<resultMap type="Delivery" id="deliveryResultMap">
+		<id column="DELI_NO" property="deliNo"/>
+		<result column="DELI_PD_NO" property="deliPdNo"/>
+		<result column="DELI_TP_NO" property="deliTpNo"/>
+		<result column="DELI_ADDR" property="deliAddr"/>
+		<result column="DELI_STATUS" property="deliStatus"/>
+		<result column="DELI_DATE" property="deliDate"/>
+		<result column="DELI_AREA" property="deliArea"/>
+		
+		<association property="product" javaType="Product">
+			<id column="pd_no" property="pdNo"/>
+			<result column="pd_name" property="pdName"/>		
+		</association>
+		
+		<association property="transport" javaType="Transport">
+			<id column="tp_no" property="tpNo"/>
+			<result column="tp_name" property="tpName"/>
+		</association>
+			
+		<association property="production" javaType="Production">
+			<id column="pdn_no" property="pdnNo"/>
+			<result column="pdn_product" property="pdnProduct"/>
+		</association>
+
+	</resultMap>
+	
+	<select id="selectDeliveryList" parameterType="Delivery" resultMap="deliveryResultMap">
+		select deli_no, tp_name, pdn_product, deli_area , deli_addr, deli_status,deli_date from delivery inner join transport on tp_no = deli_tp_no
+		inner join product on product.pd_no = deli_pd_no inner join production on pdn_no = pd_pdn_no
+	</select>
+	
+	<select id="selectDeliveryNoList" parameterType="string" resultMap="deliveryResultMap">
+		select * from delivery inner join transport on tp_no = deli_tp_no
+		inner join product on product.pd_no = deli_pd_no inner join production on pdn_no = pd_pdn_no where deli_no = #{deliNo}
+	</select>
+	
+	<update id="updateDeliveryStatus">
+		update delivery set deli_status = 1 where deli_pd_no = #{deliTpNo}
+	</update>
+	
+	<update id="updateDeliveryTransfort">
+		update delivery set DELI_TP_NO = #{deliTpNo} where deli_no = #{deliNo}
+	</update>
+	
+	<select id="selectDynamicProductList" parameterType="Delivery" resultMap="deliveryResultMap">
+		select deli_no, tp_name, pdn_product, deli_area , deli_addr, deli_status,deli_date from delivery inner join transport on tp_no = deli_tp_no
+		inner join product on product.pd_no = deli_pd_no inner join production on pdn_no = pd_pdn_no
+		<where>
+			<if test="deliNo!=null and deliNo!=''">
+				deli_no like '%'||#{deliNo}||'%'
+			</if>
+			<if test="transport.tpName!=null and transport.tpName!=''">
+				and tp_name like '%'||#{transport.tpName}||'%'
+			</if>
+			<if test="deliArea!=null and deliArea!=''">
+				and deli_area like '%'||#{deliArea}||'%'
+			</if>
+			<if test="deliStatus!=''">
+				and deli_status = #{deliStatus}
+			</if>
+			<if test="deliDate!=null and deliDate!=''">
+				and deli_date like '%'||#{deliDate}||'%'
+			</if>
+		</where>
+	</select>
+</mapper>

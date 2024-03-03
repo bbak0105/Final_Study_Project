@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.ClientMapper">
+
+	<resultMap type="Client" id="clientResultMap">
+		
+		<id column="clt_no" property="cltNo"/>
+		<result column="clt_name" property="cltName"/>
+		<result column="clt_phone" property="cltPhone"/>
+		<result column="clt_admin" property="cltAdmin"/>
+		<result column="clt_location" property="cltLocation"/>
+		<result column="client_status" property="cltStatus"/>
+	</resultMap>
+	
+	<select id="selectClientList" resultType="Client">
+		<!-- select clt_no, clt_name, clt_phone, clt_admin, clt_location from client order by clt_no desc -->
+		select clt_no, clt_name, clt_phone, clt_admin, clt_location from client where clt_status = 0 order by to_number(clt_no)
+	</select>
+	
+	<select id="selectClientNo" resultType="Client">
+		select clt_no, clt_name, clt_phone, clt_admin, clt_location, clt_status from client where clt_no = #{cltNo} order by to_number(clt_no)
+	</select>
+	
+	<select id="selectClient" resultType="Client">
+		select clt_no, clt_name, clt_phone, clt_admin, clt_location from client where clt_status = 0  
+		<where>
+			<if test="clt_location != null and clt_location != ''">
+				and clt_location = #{cltLocation}
+			</if>
+			
+			<if test="clt_name != null and clt_name != ''">
+				and clt_name like '%'||#{cltName}||'%'
+			</if>
+			
+			<if test="clt_location != null and clt_location != '' and clt_name != null and clt_name != ''">
+				and clt_location = #{cltLocation} and clt_name like '%'||#{cltName}||'%'
+			</if>
+		</where>
+		order by to_number(clt_no)
+	</select>
+	
+	<insert id="insertClient">
+		<!-- insert into client values ((select nvl(max(clt_no)+1,0) from client), #{clt_name}, #{clt_phone}, #{clt_admin}, #{clt_location}, 0) -->
+		insert into client values ((select nvl(max(to_number(clt_no))+1,0) from client), #{cltName}, #{cltPhone}, #{cltAdmin}, #{cltLocation}, 0)
+	</insert>
+	
+	<update id="updateClient">
+		update client set clt_name = #{cltName}, clt_phone = #{cltPhone}, clt_admin = #{cltAdmin}, clt_location = #{cltLocation}, clt_status = #{cltStatus} where clt_no = #{cltNo}
+	</update>
+</mapper>

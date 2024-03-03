@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.SalaryMapper">
+	<!-- parameterType 속성 생략 가능 -->
+	<!-- <insert id="insertStudent">
+		insert into student values(#{no},#{name},#{phone},#{address},#{birthday})
+	</insert> -->
+	
+	<insert id="insertSalary">
+	 	insert into salary values((select (nvl(max(sal_no), 100000) + 1) sal_no from salary), #{salEmpNo}, to_char(sysdate, 'yy-mm'), #{salBase}, #{salHoliday}, #{salPsum}, #{salAnnuity}, #{salHealth}, #{salHire}, #{salIncome}, #{salLocal}, #{salMsum}, #{salPay})
+	</insert>
+	
+	
+	
+	<resultMap type="Salary" id="SalaryResultMap">
+		<id column="sal_no" property="salNo"/>
+		<result column="sal_emp_no" property="salEmpNo"/>
+		<result column="sal_month" property="salMonth"/>		
+		<result column="sal_base" property="salBase"/>
+		<result column="sal_holiday" property="salHoliday"/>
+		<result column="sal_psum" property="salPsum"/>
+		<result column="sal_annuity" property="salAnnuity"/>
+		<result column="sal_health" property="salHealth"/>
+		<result column="sal_hire" property="salHire"/>
+		<result column="sal_income" property="salIncome"/>
+		<result column="sal_local" property="salLocal"/>
+		<result column="sal_msum" property="salMsum"/>
+		<result column="sal_pay" property="salPay"/>
+										
+		<association property="employee" javaType="Employee">
+			<id column="emp_no" property="empNo"/>
+			<result column="emp_name" property="empName"/>
+			<result column="emp_depart" property="empDepart"/>
+			<result column="emp_grade" property="empGrade"/>
+			<result column="emp_end" property="empEnd"/>			
+		</association>					
+	</resultMap>
+	
+	<select id="selectSalaryNo" parameterType="Salary" resultMap="SalaryResultMap">
+	 select * from salary where sal_no=#{salNo}
+	</select>
+	 
+	<select id="selectSalList" parameterType="Salary" resultMap="SalaryResultMap">
+		select sal_month, sal_no, emp_no, emp_grade, emp_depart, emp_name, sal_psum, sal_msum, sal_pay from salary inner join employee on salary.sal_emp_no=employee.emp_no	 
+	</select>
+	
+		<select id="selectDynamicSalList" parameterType="Salary" resultMap="SalaryResultMap">
+			select sal_month, sal_no, emp_no, emp_grade, emp_depart, emp_name, sal_psum, sal_msum, sal_pay from salary inner join employee on salary.sal_emp_no=employee.emp_no	
+		<where>
+	
+			<if test="employee.empNo!=null and employee.empNo!=''">
+				emp_no like '%'||#{employee.empNo}||'%'
+			</if>
+			<if test="employee.empDepart!=null and employee.empDepart!=''">
+				and emp_depart like '%'||#{employee.empDepart}||'%'
+			</if>
+			<if test="employee.empName!=null and employee.empName!=''">
+				and emp_name like '%'||#{employee.empName}||'%'
+			</if>
+		
+			 <if test="salMonth!=null and salMonth!=''">
+				and sal_month like '%'||#{salMonth}||'%'
+			</if>
+		</where>
+	</select>
+	
+
+	
+</mapper>

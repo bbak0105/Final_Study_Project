@@ -1,0 +1,40 @@
+package com.itwill.service;
+import java.util.List;
+import com.itwill.dto.Sales;
+
+public interface SalesService {
+	
+	//기간 검색
+	List<Sales> getTermList(Sales sales);
+	
+	//주간검색
+	List<Sales> getWeekList();
+	
+	//월 검색
+	List<Sales> getMonthList();
+	
+	//주간최대매출
+	List<Sales> getWeekMax();
+			
+	//주간최소매출
+	List<Sales> getWeekMin();
+			
+	//주간총매출
+	List<Sales> getWeekEntire();
+			
+	//주간평균매출
+	List<Sales> getWeekAvg();
+			
+	//월간최대매출
+	List<Sales> getMonthMax();
+			
+	//월간최소매출
+	List<Sales> getMonthMin();
+			
+	//월간총매출
+	List<Sales> getMonthEntire();
+			
+	//월간평균매출
+	List<Sales> getMonthAvg();
+	
+}

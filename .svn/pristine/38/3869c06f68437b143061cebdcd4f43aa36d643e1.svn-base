@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.ApprovalMapper">
+	<!-- parameterType 속성 생략 가능 -->
+	<!-- <insert id="insertStudent">
+		insert into student values(#{no},#{name},#{phone},#{address},#{birthday})
+	</insert> -->
+	
+	
+	<insert id="insertApproval">
+		insert into authorization values ((select (nvl(max(appr_no), 100000) + 1) appr_no from approval), #{apprAuthNo}, #{apprEmpNo}, sysdate) 
+	</insert>	
+	
+	<resultMap type="Approval" id="ApprovalResultMap">
+		<id column="appr_no" property="apprNo"/>
+		<result column="appr_auth_no" property="apprAuthNo"/>
+		<result column="appr_emp_no" property="apprEmpNo"/>
+		<result column="appr_date" property="apprDate"/>
+							
+		<association property="authorization" javaType="Authorization">
+			<id column="auth_no" property="authNo"/>
+			<result column="auth_case" property="authCase"/>
+			<result column="auth_subject" property="authSubject"/>
+			<result column="auth_content" property="authContent"/>
+			<result column="auth_reqdate" property="authReqdate"/>
+			<result column="auth_file" property="authFile"/>
+		</association>
+	
+		<association property="employee" javaType="Employee">
+			<id column="emp_no" property="empNo"/>
+			<result column="emp_name" property="empName"/>
+			<result column="emp_depart" property="empDepart"/>
+			<result column="emp_grade" property="empGrade"/>
+		</association>					
+	</resultMap>
+	<!--  
+	<select id="selectApprList" parameterType="Approval" resultMap="ApprovalResultMap">
+		select appr_no, emp_name, emp_depart, emp_grade, auth_subject, auth_yn, auth_reqdate, appr_date from approval inner join authorization  employee on authorization.auth_emp_no=employee.emp_no where auth_yn='0' and auth_delete='0' order by auth_no desc
+	</select>
+	 -->
+
+	
+</mapper>

@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.SalesMapper">
+
+<resultMap type="Sales" id="salesResultMap">
+
+   <result column="raw_price" property="rawPrice"/><!-- 생산원가 -->
+   <result column="total_sales" property="totalSales"/><!-- 매출액 -->
+   <result column="pure_sales" property="pureSales"/><!-- 순매출액 -->
+   <result column="now_month" property="nowMonth"/><!-- 현재달 -->
+   <result column="maxi_sales" property="maxiSales"/> <!-- 최대/최소 -->
+   <result column="entire_sales" property="entireSales"/><!-- 전체매출 -->
+   <result column="avg_sales" property="avgSales"/><!-- 평균매출 -->
+   <result column="total_bestworst" property="totalBestworst"/><!-- 워스트베스트 -->
+   
+   <result column="nowmonth_sales" property="nowmonthSales"/><!-- 현재월 매출 -->
+   <result column="lastmonth_sales" property="lastmonthSales"/><!-- 지난월 매출 -->
+   <result column="nowbun_sales" property="nowbunSales"/><!-- 현재분기 매출 -->
+   <result column="lastbun_sales" property="lastbunSales"/><!-- 저번분기 매출 -->
+   <result column="nowyear_sales" property="nowyearSales"/><!-- 현재년도 매출 -->
+   <result column="lastyear_sales" property="lastyearSales"/><!-- 작년도 매출 -->
+   
+   <association property="relout" javaType="Relout"> <!-- 출고테이블 -->
+      <id column="rel_no" property="relNo"/>
+      <result column="rel_date" property="relDate"/> <!-- 출고날짜 -->
+      <result column="rel_cnt" property="relCnt"/> <!-- 출고갯수 -->
+      <result column="rel_price" property="relPrice"/> <!-- 출고원자재가격 -->
+   </association>
+   
+   <association property="product" javaType="Product"><!-- 상품테이블 -->
+      <id column="pd_no" property="pdNo"/> 
+      <result column="pd_price" property="pdPrice"/> <!-- 상품가격(가격) -->
+      <result column="pd_cnt" property="pdCnt"/> <!-- 상품갯수 -->
+      <result column="pd_pdn_no" property="pdPdnNo"/> <!-- 조인조건 : 생산번호 -->
+   </association>
+
+   <association property="production" javaType="Production"> <!-- 생산 테이블 -->
+      <id column="pdn_no" property="pdnNo"/>  <!-- 조인조건 : 생산번호 -->
+      <result column="pdn_product" property="pdnProduct"/>  <!-- 상품이름 -->
+   </association>
+   
+</resultMap>
+
+<!-- 기간검색 (OK) -->
+<select id="selectTermList" resultMap="salesResultMap" parameterType="Sales">
+   
+   select 
+   rel_date,
+   pdn_product,
+   pd_cnt,
+   rel_price*rel_cnt as raw_price,
+   pd_price*pd_cnt as total_sales,
+   (pd_price*pd_cnt)-(rel_price*rel_cnt) as pure_sales
+   from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+   where rel_date between to_char(#{startDate}) and to_char(#{endDate})
+   order by rel_date
+
+</select>
+
+<!-- 전체검색 -->
+<select id="selectSalesList" resultMap="salesResultMap">
+   select 
+   rel_date,
+   pdn_product,
+   pd_cnt,
+   rel_price*rel_cnt as raw_price,
+   pd_price*pd_cnt as total_sales,
+   (pd_price*pd_cnt)-(rel_price*rel_cnt) as pure_sales
+   from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+   order by rel_date
+</select> 
+
+<!-- 주간매출 -->
+<select id="selectWeekList" resultMap="salesResultMap" parameterType="Sales">
+   select 
+   rel_date,
+   pdn_product,
+   pd_cnt, 
+   rel_price*rel_cnt as raw_price,
+   pd_price*pd_cnt as total_sales, 
+   (pd_price*pd_cnt)-(rel_price*rel_cnt) as pure_sales 
+   from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+   where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
+   order by rel_date
+</select>
+
+<!-- 월간매출(OK) -->
+<select id="selectMonthList" resultMap="salesResultMap" >
+   select 
+   rel_date,
+   pdn_product,
+   pd_cnt,
+   rel_price*rel_cnt as raw_price, 
+   pd_price*pd_cnt as total_sales, 
+   (pd_price*pd_cnt)-(rel_price*rel_cnt) as pure_sales 
+   from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+   where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+   (SELECT LEVEL AS LEV FROM DUAL
+   <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+</select>
+
+<!-- 주간매출 -->
+<!-- 주간매출 : 주간최대매출 -->
+<select id="selectWeekMax" resultMap="salesResultMap">
+    select * from(select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales,
+    sum(pd_price*pd_cnt) over(partition by rel_date) maxi_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
+    order by maxi_sales desc)
+  <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 주간매출 : 주간최소매출 -->
+<select id="selectWeekMin" resultMap="salesResultMap">
+    select * from(select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales,
+    sum(pd_price*pd_cnt) over(partition by rel_date) maxi_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
+    order by maxi_sales asc)
+     <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 주간매출 : 주간총매출 -->
+<select id="selectWeekEntire" resultMap="salesResultMap">
+    select sum(total_sales)entire_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
+    order by rel_date desc)
+</select>
+
+<!-- 주간매출 : 주간평균매출 -->
+<select id="selectWeekAvg" resultMap="salesResultMap">
+	select round(avg(total_sales))avg_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
+    order by rel_date desc)
+</select>
+
+<!-- 월간매출 -->
+<!-- 월간매출 : 월간최대매출 -->
+<select id="selectMonthMax" resultMap="salesResultMap">
+    select * from(select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales,
+    sum(pd_price*pd_cnt) over(partition by rel_date) maxi_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+    order by maxi_sales desc)
+     <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 월간매출 : 월간최소매출 -->
+<select id="selectMonthMin" resultMap="salesResultMap">
+    select * from(select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales,
+    sum(pd_price*pd_cnt) over(partition by rel_date) maxi_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+    order by maxi_sales asc)
+     <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 월간매출 : 월간총매출 -->
+<select id="selectMonthEntire" resultMap="salesResultMap">
+    select sum(total_sales)entire_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+      <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+    order by rel_date desc)
+</select>
+
+<!-- 월간매출 : 월간평균매출 -->
+<select id="selectMonthAvg" resultMap="salesResultMap">
+    select round(avg(total_sales))avg_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+    order by rel_date desc)
+</select>
+
+<!-- 기간베스트아이템 -->
+<select id="selectBestItem" resultMap="salesResultMap" parameterType="Sales">
+    select * from
+    (select pdn_product,
+    sum(pd_cnt) over(partition by pdn_product) total_bestworst
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(#{startDate}) and to_char(#{endDate})
+    order by total_bestworst desc) 
+     <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 기간워스트아이템 -->
+<select id="selectWorstIme" resultMap="salesResultMap" parameterType="Sales">
+    select * from
+    (select pdn_product,
+    sum(pd_cnt) over(partition by pdn_product) total_bestworst
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(#{startDate}) and to_char(#{endDate})
+    order by total_bestworst asc) 
+    <![CDATA[where rownum<=1]]>
+</select>
+
+<!-- 기간총매출 -->
+<select id="selectTermTotal" resultMap="salesResultMap" parameterType="Sales">
+    select sum(total_sales)entire_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(#{startDate}) and to_char(#{endDate})
+    order by rel_date desc)
+</select>
+
+<!-- 기간평균매출 -->
+<select id="selectTermAvg" resultMap="salesResultMap" parameterType="Sales">
+	select round(avg(total_sales))avg_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between to_char(#{startDate}) and to_char(#{endDate})
+    order by rel_date desc)
+</select>
+
+
+<!-- 메인페이지 -->
+<!-- 메인페이지 베스트셀러 -->
+<select id="selectNowBest" resultMap="salesResultMap">
+    select * from
+    (select pdn_product,
+    pd_price,
+    sum(pd_cnt) over(partition by pdn_product) total_bestworst
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+    (SELECT LEVEL AS LEV FROM DUAL
+    <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>)))
+    group by pdn_product,total_bestworst,pd_price
+    order by total_bestworst desc
+</select>
+
+<!-- 현재 월 -->
+<select id="selectNowMonth" resultMap="salesResultMap">
+    select EXTRACT(MONTH FROM SYSDATE) now_month
+    from dual
+</select>
+
+<!-- 한달 간 총 주문수 -->
+<select id="selectTotalOrder" resultMap="salesResultMap">
+ 	select count(*) as total_sales
+    from relout
+     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+</select>
+
+<!-- 한달 간 총 발주량 -->
+<select id="selectTotalRelout" resultMap="salesResultMap">
+	select 
+    sum(pd_cnt) as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+     (SELECT LEVEL AS LEV FROM DUAL
+     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+</select>
+
+<!-- 이번달 매출 -->
+<select id="selectNowmonthSales" resultMap="salesResultMap">
+  select sum(total_sales)nowmonth_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
+    (SELECT LEVEL AS LEV FROM DUAL
+    <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
+    order by rel_date desc)
+</select>
+<!-- 저번달 매출 -->
+<select id="selectLastmonthSales" resultMap="salesResultMap">
+	 select sum(total_sales)lastmonth_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between TRUNC(add_months(sysdate,-1)+1)-to_char(sysdate,'dd')and
+    TRUNC(last_day(add_months(sysdate,-1)))+0.99999421)
+</select>
+<!-- 이번분기 매출 -->
+<select id="selectNowbunSales" resultMap="salesResultMap">
+	select sum(total_sales)nowbun_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between 
+    (select to_char(add_months(sysdate,-6),'yyyy-MM-dd') last_year from dual)
+    and
+    (select to_char(add_months(sysdate,0),'yyyy-MM-dd') now_month from dual))
+</select>
+<!-- 저번분기 매출 -->
+<select id="selectLastbunSales" resultMap="salesResultMap">
+	select sum(total_sales)lastbun_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between 
+    (select to_char(add_months(sysdate,-12),'yyyy-MM-dd') last_year from dual)
+    and
+    (select to_char(add_months(sysdate,-6),'yyyy-MM-dd') now_month from dual))
+</select>
+<!-- 현재년도 매출 -->
+<select id="selectNowyearSales" resultMap="salesResultMap">
+	select sum(total_sales) nowyear_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between 
+    (select to_char(add_months(sysdate,-12),'yyyy-MM-dd') last_year from dual)
+    and
+    (select to_char(add_months(sysdate,-0),'yyyy-MM-dd') now_month from dual))
+</select>
+<!-- 작년도 매출 -->
+<select id="selectLastyearSales" resultMap="salesResultMap">
+	select sum(total_sales)lastyear_sales from
+    (select 
+    rel_date,
+    pdn_product,
+    pd_price*pd_cnt as total_sales
+    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
+    where rel_date between 
+    (select to_char(add_months(sysdate,-24),'yyyy-MM-dd') last_year from dual)
+    and
+    (select to_char(add_months(sysdate,-12),'yyyy-MM-dd') now_month from dual))
+</select>
+
+</mapper>

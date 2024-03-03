@@ -1,0 +1,13 @@
+package com.itwill.mapper;
+import java.util.List;
+import java.util.Map;
+
+import com.itwill.dto.Sales;
+
+public interface SalesMapper {
+
+	//월 전체 검색
+	List<Sales> selectMonthList();
+	//기간 검색
+	List<Sales> selectTermList(Sales sales);
+}

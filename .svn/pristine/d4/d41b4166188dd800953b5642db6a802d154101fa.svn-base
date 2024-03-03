@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.ReloutMapper">
+	
+	<insert id="insertRel">
+		insert into relout values (to_char(sysdate, 'yyyyMMdd') || '-' || (110000 + (select count(substr(rel_no, 1, 8)) from relout where substr(rel_no, 1, 8) = to_char(sysdate, 'yyyyMMdd')) + 1) , #{relPrice}, sysdate, #{relCnt},  0)
+	</insert>
+	
+	<select id="selectRelList" resultType="Relout">
+		select rel_no, rel_date, rel_cnt, rel_price from relout where rel_status = 1 order by rel_no
+	</select>
+</mapper>

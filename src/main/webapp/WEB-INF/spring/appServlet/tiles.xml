@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Fundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<!-- definition : 템플릿 페이지를 설정하기 위한 상위 엘리먼트 -->
+	<!-- name 속성 : definition 엘리먼트의 고유값을 속성값으로 설정 -->
+	<!-- = 요청처리 메소드의 반환값(ViewName)으로 사용 -->
+	<!-- main으로 반환하지 않으면 TilesResolver가 아니라, InternalViewResolver가 응답하는 것.  -->
+	<definition name="main_template" template="/WEB-INF/views/layout/template.jsp">
+		<!-- put-attribute : 템플릿 페이지를 구성하는 뷰페이지(JSP)를 설정할 수 있도록 하는 엘리먼트 -->
+		<!-- name 속성 : put-attribute 엘리먼트의 고유값을 속성값으로 설정 -->
+		<put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+		<put-attribute name="sidebar" value="/WEB-INF/views/layout/sidebar.jsp"/>
+		<put-attribute name="content" value="/WEB-INF/views/main/main.jsp"/>
+		<put-attribute name="chat" value="/WEB-INF/views/layout/chatting.jsp"/>
+	</definition>
+	
+	<definition name="*" extends="main_template">
+		<!-- 상속받은 put-attribute 엘리먼트를 재선언하여 사용(Overide) -->
+		<!-- 즉, 얘만 계속 바꿔가면서 재사용하겠다는 의미 -->
+		<put-attribute name="content" value="/WEB-INF/views/{1}.jsp"/>
+	</definition>
+	
+	<definition name="*/*" extends="main_template">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*" extends="main_template">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+</tiles-definitions>

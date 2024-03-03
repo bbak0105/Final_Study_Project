@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.TransportMapper">
+	
+	<resultMap type="Transport" id="transportResultMap">
+		<id column="tp_no" property="tpNo"/>
+		<result column="tp_name" property="tpName"/>
+		<result column="tp_phone" property="tpPhone"/>		
+	</resultMap>
+	
+	<insert id="insertTransport">
+		insert into transport values(#{tpNo},#{tpPhone},#{tpName})
+	</insert>
+	
+	<!-- 중복검사 -->
+	<select id="selectTransprotDoubleCheck" parameterType="string" resultMap="transportResultMap">
+		select tp_no from transport where tp_no = #{tpNo} 
+	</select>
+	
+	<!-- 수정 -->
+	<update id="updateTransport">
+		update transport 
+		<set>
+			<if test="tpName != null and tpName != ''">
+			 	tp_name = #{tpName}
+			 </if>
+			 <if test="tpPhone != null and tpPhone != ''">
+			 	and tp_phone = #{tpPhone}
+			 </if>
+		</set> 
+		where tp_no = #{tpNo}
+	</update>
+	
+	<select id="selectTransprotList" parameterType="Transport" resultMap="transportResultMap">
+		select * from transport order by tp_no desc
+	</select>
+
+	<select id="selectDynamicTransprotList" parameterType="Transport" resultMap="transportResultMap">
+		select * from transport 
+		<where>
+			<if test="tpNo!=null and tpNo!=''">
+				and tp_no like '%'||#{tpNo}||'%'
+			</if>
+			<if test="tpName!=null and tpName!=''">
+				and tp_name = #{tpName}
+			</if>
+		</where>
+		order by tp_no desc
+	</select>
+		
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.AuthorizationMapper">
+	<!-- parameterType 속성 생략 가능 -->
+	<!-- <insert id="insertStudent">
+		insert into student values(#{no},#{name},#{phone},#{address},#{birthday})
+	</insert> -->
+	
+	
+	<insert id="insertAuthorization">
+		insert into authorization values ((select (nvl(max(auth_no), 100000) + 1) auth_no from authorization), #{authEmpNo}, #{authCase}, #{authContent}, #{authWhile}, '0', to_char(sysdate,'yyyy-mm-dd'), '0', null, #{authFile}, #{authSubject},#{authUpload},#{authSdate},#{authEdate},null) 
+	</insert>
+	
+	<update id="approvalAuthorization">
+		update authorization set auth_yn=1, auth_appdate=to_char(sysdate, 'yyyy-mm-dd') where auth_no=#{authNo} 
+	</update>
+	
+	<update id="deleteAuthorization">
+		update authorization set auth_delete=1, auth_deldate=to_char(sysdate,'yyyy-mm-dd') where auth_no=#{authNo} 
+	</update>
+	
+	<resultMap type="Authorization" id="AuthorizationResultMap">
+		<id column="auth_no" property="authNo"/>
+		<result column="auth_emp_no" property="authEmpNo"/>
+		<result column="auth_case" property="authCase"/>
+		<result column="auth_content" property="authContent"/>
+		<result column="auth_while" property="authWhile"/>
+		<result column="auth_yn" property="authYn"/>
+		<result column="auth_reqdate" property="authReqdate"/>
+		<result column="auth_delete" property="authDelete"/>
+		<result column="auth_deldate" property="authDeldate"/>
+		<result column="auth_file" property="authFile"/>
+		<result column="auth_subject" property="authSubject"/>	
+		<result column="auth_sdate" property="authSdate"/>
+		<result column="auth_edate" property="authEdate"/>
+		<result column="auth_appdate" property="authAppdate"/>
+		<result column="auth_sum" property="authSum"/>
+						
+	
+		<association property="employee" javaType="Employee">
+			<id column="emp_no" property="empNo1"/>
+			<result column="emp_name" property="empName"/>
+			<result column="emp_depart" property="empDepart"/>
+			<result column="emp_grade" property="empGrade"/>
+		</association>					
+	</resultMap>
+	
+	<select id="selectAuthWhile" parameterType="Authorization" resultMap="AuthorizationResultMap">
+		select sum(auth_while)auth_sum from authorization where auth_emp_no=#{empNo} and auth_edate like '%'||to_char(sysdate, 'yy-mm')||'%'
+	</select>
+	
+	<select id="selectAthorList" parameterType="Authorization" resultMap="AuthorizationResultMap">
+		select auth_no, emp_name, emp_depart, emp_grade, auth_subject, auth_yn, auth_reqdate, auth_sdate, auth_edate from authorization inner join employee on authorization.auth_emp_no=employee.emp_no where auth_yn='0' and auth_delete='0' and emp_end='0' order by auth_no desc
+	</select>
+	            
+	<select id="selectDynamicAthorList" parameterType="Authorization" resultMap="AuthorizationResultMap">
+		select auth_no, emp_name, emp_depart, emp_grade, auth_subject, auth_yn, auth_reqdate, auth_sdate, auth_edate
+		 from authorization inner join employee on authorization.auth_emp_no=employee.emp_no
+		<where>
+	
+			<if test="authNo!=null and authNo!=''">
+				auth_no like '%'||#{authNo}||'%'
+			</if>
+			<if test="employee.empName!=null and employee.empName!=''">
+				and emp_name like '%'||#{employee.empName}||'%'
+			</if>
+			<if test="employee.empDepart!=null and employee.empDepart!=''">
+				and emp_depart like '%'||#{employee.empDepart}||'%'
+			</if>
+		
+			 <if test="authReqdate!=null and authReqdate!=''">
+				and auth_reqdate like '%'||#{authReqdate}||'%'
+			</if>
+		</where>
+	</select>
+	
+
+		<select id="selectApprList" parameterType="Authorization" resultMap="AuthorizationResultMap">
+		select auth_no, emp_name, emp_depart, emp_grade, auth_subject, auth_yn, auth_reqdate, auth_appdate from authorization inner join employee on authorization.auth_emp_no=employee.emp_no where auth_yn='1' and auth_delete='0' and emp_end='0' order by auth_no desc
+	</select>
+	
+	
+		<select id="selectDynamicApprList" parameterType="Authorization" resultMap="AuthorizationResultMap">
+	select auth_no, emp_name, emp_depart, emp_grade, auth_subject, auth_yn, auth_reqdate, auth_appdate from authorization inner join employee on authorization.auth_emp_no=employee.emp_no
+		<where>
+	
+			<if test="authNo!=null and authNo!=''">
+				auth_no like '%'||#{authNo}||'%'
+			</if>
+			<if test="employee.empName!=null and employee.empName!=''">
+				and emp_name like '%'||#{employee.empName}||'%'
+			</if>
+			<if test="employee.empDepart!=null and employee.empDepart!=''">
+				and emp_depart like '%'||#{employee.empDepart}||'%'
+			</if>
+		<if test="authYn!=null and authYn=''">
+				and auth_yn like '%'||#{authYn}||'%'
+			</if>
+		
+			 <if test="authAppdate!=null and authAppdate!=''">
+				and auth_appdate like '%'||#{authAppdate}||'%'
+			</if>
+		</where>
+		and auth_yn='1' and auth_delete='0' and emp_end='0' order by auth_no desc
+	</select>
+	
+	
+	<select id="selectAthorNo" parameterType="Authorization" resultMap="AuthorizationResultMap">
+		select auth_no, auth_case, auth_emp_no, emp_name, emp_depart, emp_grade, auth_subject, auth_content, auth_while, auth_reqdate, auth_upload, auth_file, auth_sdate, auth_edate from authorization inner join employee on authorization.auth_emp_no=employee.emp_no where auth_no=#{authNo} 
+	</select>
+
+	
+</mapper>

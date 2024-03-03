@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.AttitudeMapper">
+
+	<insert id="insertAttitude">
+		insert into attitude values (#{attdNo}, #{attdEmpNo}, '출근', '정상근무', to_char(SYSDATE, 'hh24:mi:ss'),null, to_char(SYSDATE, 'yy-mm-dd'))
+	</insert>
+	
+	<insert id="insertVacation">
+		insert into attitude values (#{attdNo}, #{attdEmpNo}, #{attdContent}, #{attdCase}, #{attdStime}, #{attdEtime}, null)
+	</insert>
+	
+	
+	<update id="updateAttitude">
+     update attitude set attd_content='퇴근', attd_etime=to_char(SYSDATE, 'hh24:mi:ss') where attd_emp_no='20201001'
+	</update>
+	
+	<resultMap type="Attitude" id="AttitudeResultMap">
+		<id column="attd_no" property="attdNo"/>
+		<result column="attd_emp_no" property="attdEmpNo"/>
+		<result column="attd_content" property="attdContent"/>
+		<result column="attd_case" property="attdCase"/>
+		<result column="attd_stime" property="attdStime"/>
+		<result column="attd_etime" property="attdEtime"/>
+		<result column="attd_date" property="attdDate"/>
+		<result column="attd_no_count" property="attdNoCount"/>
+		
+		<association property="employee" javaType="Employee">
+			<id column="emp_no" property="empNo"/>
+			<result column="emp_name" property="empName"/>
+			<result column="emp_depart" property="empDepart"/>
+			<result column="emp_grade" property="empGrade"/>
+		</association>	
+	</resultMap>
+	
+	<select id="selectAttdNo" parameterType="Attitude" resultMap="AttitudeResultMap" >
+		select count(attd_no) attd_no_count from attitude where attd_emp_no=#{empNo} and attd_date like '%'||to_char(sysdate, 'yy-mm')||'%'
+	</select>
+	
+	<select id="selectAttdList" parameterType="Attitude" resultMap="AttitudeResultMap">
+		select attd_date, emp_depart, emp_grade, emp_name, attd_case, attd_content, attd_stime, attd_etime from attitude inner join employee on attitude.attd_emp_no=employee.emp_no where emp_end='0' order by attd_date desc
+	</select>
+	<select id="selectDynamicAttdList" parameterType="Authorization" resultMap="AttitudeResultMap">
+		select attd_date, emp_depart, emp_grade, emp_name, attd_case, attd_content, attd_stime, attd_etime
+		 from attitude inner join employee on attitude.attd_emp_no=employee.emp_no
+		<where>
+	
+			<if test="attdContent!=null and attdContent!=''">
+				attd_content like '%'||#{attdContent}||'%'
+			</if>
+			<if test="employee.empName!=null and employee.empName!=''">
+				and emp_name like '%'||#{employee.empName}||'%'
+			</if>
+			<if test="employee.empDepart!=null and employee.empDepart!=''">
+				and emp_depart like '%'||#{employee.empDepart}||'%'
+			</if>
+			 <if test="attdDate!=null and attdDate!=''">
+				and attd_date like '%'||#{attdDate}||'%'
+			</if>
+		</where>
+	</select>
+	
+</mapper>

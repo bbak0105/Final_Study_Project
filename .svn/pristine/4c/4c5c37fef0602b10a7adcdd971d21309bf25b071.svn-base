@@ -1,0 +1,70 @@
+package com.itwill.service;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.itwill.dao.SalesDAO;
+import com.itwill.dto.Sales;
+
+@Service
+public class SalesServiceImpl implements SalesService{
+	
+	@Autowired
+	private SalesDAO salesDAO;
+	
+	@Override
+	public List<Sales> getTermList(Sales sales) {
+		return salesDAO.selectTermList(sales);
+	}
+	
+	@Override
+	public List<Sales> getMonthList() {
+		return salesDAO.selectMonthList();
+	}
+
+	@Override
+	public List<Sales> getWeekList() {
+		return salesDAO.selectWeekList();
+	}
+
+	@Override
+	public List<Sales> getWeekMax() {
+		return salesDAO.selectWeekMax();
+	}
+
+	@Override
+	public List<Sales> getWeekMin() {
+		return salesDAO.selectWeekMin();
+	}
+
+	@Override
+	public List<Sales> getWeekEntire() {
+		return salesDAO.selectWeekEntire();
+	}
+
+	@Override
+	public List<Sales> getWeekAvg() {
+		return salesDAO.selectWeekAvg();
+	}
+
+	@Override
+	public List<Sales> getMonthMax() {
+		return salesDAO.selectMonthMax();
+	}
+
+	@Override
+	public List<Sales> getMonthMin() {
+		return salesDAO.selectMonthMin();
+	}
+
+	@Override
+	public List<Sales> getMonthEntire() {
+		return salesDAO.selectMonthEntire();
+	}
+
+	@Override
+	public List<Sales> getMonthAvg() {
+		return salesDAO.selectMonthAvg();
+	}
+
+
+}

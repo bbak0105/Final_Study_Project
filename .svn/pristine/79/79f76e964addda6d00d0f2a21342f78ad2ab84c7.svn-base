@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.ProductionMapper">
+	
+	<select id="selectProductionList">
+		select pdn_no, pdn_po_no, pdn_cnt, pdn_product, pdn_date, pdn_emp_no, pdn_status, pdn_rel_no from production where pdn_status = 0 order by pdn_no
+	</select>
+	
+	<insert id="insertProduction">
+		insert into production values ( to_char(sysdate, 'yyyyMMdd') || '-' || (110001 + (select count(pdn_no) from production where (select substr(pdn_no, 1, 8) from (select pdn_no from production order by pdn_no desc) where rownum = 1) = to_char(sysdate, 'yyyyMMdd') and (select substr(pdn_no, 1, 8) from (select pdn_no from production order by pdn_no desc) where rownum = 1) = substr(pdn_no, 1, 8))) , #{pdnPnNo}, #{pdnCnt}, sysdate, #{pdnEmpNo}, #{pdnStatus}, #{pdnProduct}, #{pdnRelNo})
+	</insert>
+</mapper>

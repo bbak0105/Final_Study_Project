@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/img/**" location="/resources/img/" />
+	<resources mapping="/css/**" location="/resources/css/" />
+	<resources mapping="/js/**" location="/resources/js/" />
+	<resources mapping="/less/**" location="/resources/less/" />
+	<resources mapping="/media/**" location="/resources/media/" />
+	<resources mapping="/vendors/**" location="/resources/vendors/" />
+	<resources mapping="/fonts/**" location="/resources/fonts/" />
+	<resources mapping="resources/**" location="resources/"/>
+	
+
+	<!-- UrlBasedViewResolver : Spring에서 제공되는 ViewResolver를 사용하지 않고
+	외부에서 제공하는 ViewResolver를 사용하기 위한 기능을 제공하는 클래스 -->
+	<beans:bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<!-- viewClass 필드에 외부에서 제공하는 ViewResolver 클래스(TilesView)를 인젝션 처리 -->
+		<beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView"/>
+		<!-- order 필드에 ViewResolver 우선순위 관련 정수값을 인젝션 처리 -->
+		<!-- => 정수값이 낮을수록 우선순위가 높게 설정 -->
+		<beans:property name="order" value="2"/>
+	</beans:bean>	
+	
+	<!-- TilesConfigurer : Tiles 프로그램에서 사용할 템플릿 페이지 정보가
+	저장된 XML 파일(Tiles 환경설정파일)을 지정하기 위한 클래스 -->
+	<beans:bean class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<!-- definitions 필드에 XML 파일 경로를 요소로 저장하는 배열을 생성하여 인젝션 처리 -->
+		<beans:property name="definitions">
+			<beans:list>
+				<beans:value>/WEB-INF/spring/appServlet/tiles.xml</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+	
+	<!-- 파일 업로드 기능을 제공하는 클래스를 Spring Bean으로 등록 -->
+	<!-- => beanName은 반드시 multipartResolver로 설정-->	
+	<beans:bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver">
+		<!-- maxUploadSize 필드에 업로드 파일의 용량 제한값(Byte)을 인젝션 처리 -->
+		<beans:property name="maxUploadSize" value="20971520"/>
+		<!-- defaultEncoding 필드에 입력값에 대한 캐릭터셋의 인코딩을 인젝션 처리 -->
+		<beans:property name="defaultEncoding" value="UTF-8"/>
+	</beans:bean>
+	
+	<!-- 파일 다운로드 기능을 제공하는 클래스를 Spring Bean으로 등록 -->
+	<!-- => beanName은 반드시 요청 처리 메소드에서 반환되는 viewName으로 설정 -->
+	 <beans:bean class="com.itwill.util.FileDownload" id="fileDownload"/>
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+		<beans:property name="order" value="3"/>
+	</beans:bean>
+	
+	<context:component-scan base-package="com.itwill.controller" />
+	<context:component-scan base-package="com.itwill.dao"/>
+	<context:component-scan base-package="com.itwill.service"/>
+	
+	<beans:bean class="com.itwill.util.AdminAuthInterceptor" id="adminAuthInterceptor"/>
+	<beans:bean class="com.itwill.util.LoginAuthInterceptor" id="loginAuthInterceptor"/>
+	
+	<interceptors>
+		
+		<interceptor>
+		
+			
+			<mapping path="/authorList"/>
+			<mapping path="/viewSalary"/>
+			<mapping path="/viewEmployee"/>
+			<mapping path="/insertSalaryList"/>
+			<mapping path="/insertEmployee"/>
+			<mapping path="/salarydetailList"/>
+	
+			<beans:ref bean="adminAuthInterceptor"/>
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/goWork"/>
+			<mapping path="/employeeList"/>
+			
+			<mapping path="/attitudeList"/>
+			<mapping path="/insertAuthorization"/>	
+			<mapping path="/approvalList"/>		
+			<!--  <mapping path="/"/>-->
+			 
+			<beans:ref bean="loginAuthInterceptor"/>
+		</interceptor>
+		
+	</interceptors>		
+
+	
+</beans:beans>

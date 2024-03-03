@@ -1,0 +1,28 @@
+package com.itwill.dao;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.itwill.dto.Sales;
+import com.itwill.mapper.SalesMapper;
+
+@Repository
+public class SalesDAOImpl implements SalesDAO{
+
+	@Autowired
+	private SqlSession sqlSession;
+
+	@Override
+	public List<Sales> selectMonthList() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthList();
+	}
+
+	@Override
+	public List<Sales> selectTermList(Sales sales) {
+		return sqlSession.getMapper(SalesMapper.class).selectTermList(sales);
+	}
+
+	
+}

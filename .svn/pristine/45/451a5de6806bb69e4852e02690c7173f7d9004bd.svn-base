@@ -1,0 +1,54 @@
+package com.itwill.mapper;
+import java.util.List;
+import java.util.Map;
+
+import com.itwill.dto.Sales;
+
+public interface SalesMapper {
+	
+	//기간 검색
+	List<Sales> selectTermList(Sales sales);
+	
+	//주간검색
+	List<Sales> selectWeekList();
+	
+	//월 전체 검색
+	List<Sales> selectMonthList();
+	
+	//주간최대매출
+	List<Sales> selectWeekMax();
+	
+	//주간최소매출
+	List<Sales> selectWeekMin();
+	
+	//주간총매출
+	List<Sales> selectWeekEntire();
+	
+	//주간평균매출
+	List<Sales> selectWeekAvg();
+	
+	//월간최대매출
+	List<Sales> selectMonthMax();
+	
+	//월간최소매출
+	List<Sales> selectMonthMin();
+	
+	//월간총매출
+	List<Sales> selectMonthEntire();
+	
+	//월간평균매출
+	List<Sales> selectMonthAvg();
+	
+	//기간베스트 아이템
+	List<Sales> selectBestItem(Sales sales);
+	
+	//기간워스트 아이템
+	List<Sales> selectWorstIme(Sales sales);
+	
+	//기간총매출
+	List<Sales> selectTermTotal(Sales sales);
+	
+	//기간평균매출
+	List<Sales> selectTermAvg(Sales sales);
+	
+}

@@ -1,0 +1,78 @@
+package com.itwill.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.itwill.dto.Sales;
+import com.itwill.service.SalesService;
+
+@Controller
+public class SalesController {
+	private static final Logger logger = LoggerFactory.getLogger(SalesController.class);
+
+	@Autowired
+	private SalesService salesService;
+
+	@RequestMapping(value = "/monthSales", method = RequestMethod.GET)
+	public String display(Model model) {
+		logger.info("selectMonthList 메소드 호출");
+		model.addAttribute("monthList", salesService.getMonthList());
+		return "sales/monthSales";
+	}
+
+	@RequestMapping(value = "/month_dateList", method = RequestMethod.GET)
+	public String getDateList(@ModelAttribute Sales sales, Model model) {
+		String realDateST = "";
+		String realdDateED ="";
+		
+		if (sales.getStartDate() == "" || sales.getStartDate() == null) {
+			SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd");
+			Date now = new Date();
+
+			realDateST = pattern.format(now);
+
+		} else {
+
+		String[] splitDate = sales.getStartDate().split("/");
+		String dd = splitDate[0];
+		String mm = splitDate[1];
+		String yyyy = splitDate[2];
+
+		// StartDate
+		realDateST = yyyy + "-" + mm + "-" + dd;
+		sales.setStartDate(realDateST);
+		
+		}
+
+		if(sales.getEndDate() == "" || sales.getEndDate() == null) {
+			SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd");
+			Date now = new Date();
+			
+			realdDateED = pattern.format(now);
+		} else {
+		
+		String[] splitDate2 = sales.getEndDate().split("/");
+		String DD = splitDate2[0];
+		String MM = splitDate2[1];
+		String YYYY = splitDate2[2];
+
+		// endDate
+		realdDateED = YYYY + "-" + MM + "-" + DD;
+		sales.setEndDate(realdDateED);
+		
+		}
+		
+		model.addAttribute("termList", salesService.getTermList(sales));
+		return "sales/daySales";
+
+	}
+}

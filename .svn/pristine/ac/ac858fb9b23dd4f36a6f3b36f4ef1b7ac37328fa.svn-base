@@ -1,0 +1,12 @@
+package com.itwill.service;
+import java.util.List;
+import com.itwill.dto.Sales;
+
+public interface SalesService {
+	//월 검색
+	List<Sales> getMonthList();
+	
+	//기간 검색
+	List<Sales> getTermList(Sales sales);
+	
+}

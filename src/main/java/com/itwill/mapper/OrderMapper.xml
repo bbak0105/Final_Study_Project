@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.OrderMapper">
+	<!-- parameterType 속성 생략 가능 -->
+	<!-- <insert id="insertStudent">
+		insert into student values(#{no},#{name},#{phone},#{address},#{birthday})
+	</insert> -->
+	
+	<!-- <resultMap type="Order" id="orderResultMap">
+		<id column="order_no" property="orderNo"/>
+		<result column="order_member_no" property="orderMemberNo"/>
+		<result column="order_status" property="orderStatus"/>
+		<result column="order_cnt" property="orderCnt"/>
+		<result column="order_date" property="orderDate"/>
+		<result column="order_product" property="orderProduct"/>
+	</resultMap> -->
+	
+	
+<!-- 	<select id="selectOrderNoList" parameterType="string" resultMap="orderResultMap">
+		select * from ordermain where order_no=#{orderNo}
+	</select>
+
+ 	<select id="selectOrderPersonList" parameterType="string" resultMap="orderResultMap">
+		select * from ordermain where order_member_no =#{orderMemberNo}
+	</select>
+	
+	<select id="selectOrderProductNameList" parameterType="string" resultMap="orderResultMap">
+		select * from ordermain where order_product=#{productName}
+	</select>
+
+	<select id="selectOrderDateList" parameterType="string" resultMap="orderResultMap">
+		select * from ordermain where order_date=#{orderDate} 
+	</select> -->
+	
+	<resultMap type="Order" id="order2resultMap">
+		
+		<id column="order_no" property="orderNo"/>
+		<result column="order_member_no" property="orderMemberNo"/>
+		<result column="order_status" property="orderStatus"/>
+		<result column="order_cnt" property="orderCnt"/>
+		<result column="order_date" property="orderDate"/>
+		<result column="order_product" property="orderProduct"/>
+		
+		<association property="member" javaType="Member">
+			<id column="mem_no" property="memNo"/>
+			<result column="mem_name" property="memName"/>
+		</association>
+	</resultMap>
+
+	<select id="selectOrderDetail" parameterType="Order" resultMap="order2resultMap">
+		select order_no, mem_name, order_product, order_cnt, order_date from ordermain inner join member on order_member_no = mem_no 
+		 where order_no = #{orderNo}
+	</select>
+	
+	<select id="selectOrderList" parameterType="Order" resultMap="order2resultMap">
+		select order_no, mem_name, order_product, order_cnt, order_date, order_status from ordermain inner join member on order_member_no = mem_no order by order_no
+	</select>
+		
+	<select id="selectDynamicOrderList" parameterType="Order" resultMap="order2resultMap">
+		select order_no, mem_name, order_product, order_cnt, order_date,  order_status from ordermain inner join member on order_member_no = mem_no
+		<where>
+			<if test="orderNo!=null and orderNo!=''">
+				order_no like '%'||#{orderNo}||'%'
+			</if>
+			<if test="member.memName!=null and member.memName!=''">
+				and mem_name like '%'||#{member.memName}||'%'
+			</if>
+			<if test="orderProduct!=null and orderProduct!=''">
+				and order_product like '%'||#{orderProduct}||'%'
+			</if>
+			<if test="orderDate!=null and orderDate!=''">
+				and order_date like '%'||#{orderDate}||'%'
+			</if>
+		</where>
+		order by order_no
+	</select> 
+</mapper>

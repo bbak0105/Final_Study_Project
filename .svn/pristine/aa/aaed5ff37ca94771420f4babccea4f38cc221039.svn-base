@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.StockMapper">
+	
+	<select id="selectStockList" resultType="Stock">
+		select stock_no, stock_name, stock_cnt, stock_in_date, stock_status, stock_price, stock_sale_price from stock where stock_status = 0 order by to_number(stock_no)
+	</select>
+	
+	<update id="updateDelStock">
+		update stock set stock_status = 1 where stock_rcp_no = #{stockRcpNo}
+	</update>
+	
+	<update id="updateStock">
+		update stock set stock_price = #{stock_price}, stock_sale_price = #{stockSalePrice} where stock_rcp_no = #{stockRcpNo}
+	</update>
+	
+	<insert id="insertStock">
+		insert into stock values ((select nvl(max(to_number(stock_no))+1,0) from stock), (select rcp_no from (select rcp_no from receipt where rcp_status = 0 order by rcp_no desc) where rownum = 1), (select rel_no from (select rel_no from relout order by rel_no desc) where rownum = 1), #{stockName}, #{stockCnt}, sysdate, 0, #{stockPrice}, #{stockSalePrice})
+	</insert>
+</mapper>

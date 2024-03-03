@@ -1,0 +1,73 @@
+package com.itwill.dao;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.itwill.dto.Sales;
+import com.itwill.mapper.SalesMapper;
+
+@Repository
+public class SalesDAOImpl implements SalesDAO{
+
+	@Autowired
+	private SqlSession sqlSession;
+
+	@Override
+	public List<Sales> selectMonthList() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthList();
+	}
+
+	@Override
+	public List<Sales> selectTermList(Sales sales) {
+		return sqlSession.getMapper(SalesMapper.class).selectTermList(sales);
+	}
+
+	@Override
+	public List<Sales> selectWeekList() {
+		return sqlSession.getMapper(SalesMapper.class).selectWeekList();
+	}
+
+	@Override
+	public List<Sales> selectWeekMax() {
+		return sqlSession.getMapper(SalesMapper.class).selectWeekMax();
+	}
+
+	@Override
+	public List<Sales> selectWeekMin() {
+		return sqlSession.getMapper(SalesMapper.class).selectWeekMin();
+	}
+
+	@Override
+	public List<Sales> selectWeekEntire() {
+		return sqlSession.getMapper(SalesMapper.class).selectWeekEntire();
+	}
+
+	@Override
+	public List<Sales> selectWeekAvg() {
+		return sqlSession.getMapper(SalesMapper.class).selectWeekAvg();
+	}
+
+	@Override
+	public List<Sales> selectMonthMax() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthMax();
+	}
+
+	@Override
+	public List<Sales> selectMonthMin() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthMin();
+	}
+
+	@Override
+	public List<Sales> selectMonthEntire() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthEntire();
+	}
+
+	@Override
+	public List<Sales> selectMonthAvg() {
+		return sqlSession.getMapper(SalesMapper.class).selectMonthAvg();
+	}
+
+	
+}

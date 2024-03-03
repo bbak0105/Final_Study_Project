@@ -1,0 +1,35 @@
+
+.container1 {
+  border-radius: 5px;
+  background-color: #ffffff;
+  border : black;
+  padding: 20px;
+}
+
+.col-25 {
+  float: left;
+  width: 25%;
+  margin-top: 6px;
+}
+
+.col-75 {
+  float: left;
+  width: 75%;
+  margin-top: 6px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.label-pre {
+  padding: 12px 12px 12px 35px;
+  display: inline-block;
+  text-align : center;
+}
+
+
+

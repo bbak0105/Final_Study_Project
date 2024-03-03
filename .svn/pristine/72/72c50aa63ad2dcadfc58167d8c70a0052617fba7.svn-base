@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.EmployeeMapper">
+	<!-- parameterType 속성 생략 가능 -->
+	<!-- <insert id="insertStudent">
+		insert into student values(#{no},#{name},#{phone},#{address},#{birthday})
+	</insert> -->
+	
+	
+	<insert id="insertEmployee">
+		insert into employee values (#{empNo}, #{empName}, #{empRegino}, #{empEmail}, #{empPhone}, #{empAddr}, #{empBirth}, #{empSdate}, null, #{empAccount}, #{empDepart}, #{empGrade}, #{empPhoto}, '0', #{empSchool}, #{empMajor}, #{empPasswd}, #{empUpload}) 
+	</insert>
+	
+	<update id="updateEmployee">
+		update employee set emp_name=#{empName}, emp_email=#{empEmail}, emp_phone=#{empPhone}, emp_addr=#{empAddr}, emp_birth=#{empBirth}, emp_account=#{empAccount}, emp_depart=#{empDepart}, emp_passwd=#{empPasswd}, emp_school=#{empSchool}, emp_major=#{empMajor} where emp_no=#{empNo}
+	</update>
+	
+	<update id="deleteEmployee">
+		update employee set emp_end=1, emp_edate=sysdate where emp_no=#{empNo}
+	</update>
+	
+	
+	<resultMap type="Employee" id="EmployeeResultMap">
+		<id column="emp_no" property="empNo"/>
+		<result column="emp_name" property="empName"/>
+		<result column="emp_regino" property="empRegino"/>
+		<result column="emp_email" property="empEmail"/>
+		<result column="emp_phone" property="empPhone"/>
+		<result column="emp_addr" property="empAddr"/>
+		<result column="emp_birth" property="empBirth"/>
+		<result column="emp_sdate" property="empSdate"/>
+		<result column="emp_edate" property="empEdate"/>
+		<result column="emp_account" property="empAccount"/>
+		<result column="emp_depart" property="empDepart"/>
+		<result column="emp_grade" property="empGrade"/>
+		<result column="emp_photo" property="empPhoto"/>
+		<result column="emp_end" property="empEnd"/>
+		<result column="emp_passwd" property="empPasswd"/>
+	</resultMap>
+	
+	<select id="selectEmployeeList" resultMap="EmployeeResultMap">
+		select emp_no, emp_name, emp_regino, emp_depart, emp_grade, emp_sdate, emp_account, emp_email from employee where emp_end='0' order by emp_grade
+	</select>
+	
+	<select id="selectEmployeeNo" resultMap="EmployeeResultMap">
+		select emp_no, emp_name, emp_regino, emp_email, emp_phone, emp_addr, emp_birth, emp_sdate, emp_edate, emp_account, emp_depart, emp_grade, emp_passwd, emp_school, emp_major, emp_Photo from employee where emp_no=#{empNo}
+	</select>
+	
+	<select id="insertSalaryList" resultMap="EmployeeResultMap">
+		select emp_no, emp_name, emp_regino, emp_depart, emp_grade, emp_sdate, emp_account, emp_email from employee where emp_end='0' order by emp_grade
+	</select>
+	
+	<select id="selectDynamicEmpList" parameterType="Employee" resultMap="EmployeeResultMap">
+		select emp_no, emp_name, emp_regino, emp_depart, emp_grade, emp_sdate, emp_account, emp_email from employee
+		<where>
+			
+			<if test="empNo!=null and empNo!=''">
+				emp_no like '%'||#{empNo}||'%'
+			</if>
+			<if test="empName!=null and empName!=''">
+				and emp_name like '%'||#{empName}||'%'
+			</if>
+			<if test="empDepart!=null and empDepart!=''">
+				and emp_depart like '%'||#{empDepart}||'%'
+			</if>
+			 <if test="empGrade!=null and empGrade!=''">
+				and emp_grade like '%'||#{empGrade}||'%'
+			</if>
+			and emp_end='0' order by emp_no desc
+		</where>
+	</select>
+	
+	<select id="selectDynamicSalEmpList" parameterType="Employee" resultMap="EmployeeResultMap">
+		select emp_no, emp_name, emp_regino, emp_depart, emp_grade, emp_sdate, emp_account, emp_email from employee
+		<where>
+			
+			<if test="empNo!=null and empNo!=''">
+				emp_no like '%'||#{empNo}||'%'
+			</if>
+			<if test="empName!=null and empName!=''">
+				and emp_name like '%'||#{empName}||'%'
+			</if>
+			<if test="empDepart!=null and empDepart!=''">
+				and emp_depart like '%'||#{empDepart}||'%'
+			</if>
+			 <if test="empGrade!=null and empGrade!=''">
+				and emp_grade like '%'||#{empGrade}||'%'
+			</if>
+			and emp_end='0' order by emp_no desc
+		</where>
+	</select>
+	
+	<select id="selectEmployeeInfo" parameterType="Employee" resultMap="EmployeeResultMap">
+		select * from employee where emp_no=#{empNo}
+	</select>
+</mapper>

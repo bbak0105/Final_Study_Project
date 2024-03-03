@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!-- log4jdbc-log4j2-jdbc4라이브러리에서 제공하는 DriverSpy클래스로 driverClassName필드를 인젝션 처리 -->
+	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+		 <property name="url" value="jdbc:log4jdbc:oracle:thin:@182.237.126.17:1521:xe"></property>
+	    <property name="username" value="blooming"></property>
+	    <property name="password" value="blooming"></property>
+	</bean>
+
+	<!-- SqlSessionFactory 관련 클래스를 Spring Bean으로 등록 -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactoryBean">
+		<!-- configLocation 필드에는 MyBatis 환경설정 파일 경로를 인젝션 처리 -->
+		<!-- => Spring Container(WebApplicationContext)는 webapp 디렉토리(/)의 자원에만 접근 가능 -->
+		<!-- => java 또는 resources 패키지 폴더의 자원에 접근하기 위해서는 classpath 접두사 사용 -->
+		<!-- <property name="configLocation" value="/WEB-INF/spring/mybatis-config.xml"/> -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<!-- dataSource 필드에 DataSource 관련 Spring Bean을 인젝션 처리 -->
+		<!-- => MyBatis 환경설정 파일에서 environment 엘리먼트 생략 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- typeAliasesPackage 필드에 클래스 별칭을 사용할 수 있는 패키지를 인젝션 처리 -->
+		<!-- => MyBatis 환경설정 파일에서 typeAlias 엘리먼트 생략 -->
+		<property name="typeAliasesPackage" value="com.itwill.dto"/>
+		<!-- mapperLocations 필드에 맵퍼 파일을 List 객체의 요소로 인젝션 처리 -->
+		<!-- => * 기호를 사용하여 다수의 XML Mapper 파일 등록 -->
+		<!-- => MyBatis 환경설정 파일에서 mapper 엘리먼트 생략 -->
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/itwill/mapper/*.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- SqlSession 관련 클래스를 Spring Bean으로 등록 -->
+	<!-- destroy-method 속성 : Spring Bean 소멸 전 호출되는 메소드를 속성값으로 설정 -->
+	<!-- => clearCache : SqlSession 관련 JDBC 객체를 소멸 시키는 메소드 -->
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession" destroy-method="clearCache">
+		<!-- SqlSessionFactory 관련 Spring Bean을 인젝션 처리 - Constructor Injection -->
+		<constructor-arg ref="sqlSessionFactoryBean"/>
+	</bean>
+	
+	<!-- annotation-driven : @Transactional 어노테이션을 사용하여 Transaction관련 Spring Bean 으로 트렌젝션 처리 기능을 제공하는 어노테이션 -->
+	<tx:annotation-driven/>
+
+</beans>

@@ -1,0 +1,12 @@
+package com.itwill.dao;
+import java.util.List;
+
+import com.itwill.dto.Sales;
+
+public interface SalesDAO {
+
+	//월 전체 검색
+	List<Sales> selectMonthList();
+	
+	List<Sales> selectTermList(Sales sales);
+}

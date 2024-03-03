@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.MemberMapper">
+
+
+	<resultMap type="Member" id="memberResultMap">
+		<id column="mem_no" property="memNo"/>
+		<result column="mem_id" property="memId"/>
+		<result column="mem_deli_no" property="memDeliNo"/>
+		<result column="mem_name" property="memName"/>
+		<result column="mem_phone" property="memPhone"/>
+		<result column="mem_addrno" property="memAddrno"/>
+		<result column="mem_addr" property="memAddr"/>
+		<association property="delivery" javaType="Delivery">
+		<id column="DELI_NO" property="deliNo"/>
+		<result column="DELI_STATUS" property="deliStatus"/>
+		</association>
+		
+	</resultMap>
+	
+	<select id="selectMemberList" resultMap="memberResultMap">
+	select mem_no,mem_id,mem_deli_no,mem_name,mem_phone,mem_addrno,mem_addr,deli_status from member inner join delivery on mem_deli_no= deli_no order by mem_no
+	</select>
+	<select id="selectDynamicMemberList" parameterType="Member" resultMap="memberResultMap">
+	select mem_no,mem_id,mem_deli_no,mem_name,mem_phone,mem_addrno,mem_addr,deli_status from member inner join delivery on mem_deli_no= deli_no 
+	<where>
+		<if test="memNo!=null and memNo!=''">
+			mem_no like '%'||#{memNo}||'%'
+			</if>
+				<if test="memId!=null and memId!=''">
+				and mem_id like '%'||#{memId}||'%'
+			</if>
+			<if test="memDeliNo!=null and memDeliNo!=''">
+				and mem_deli_no like '%'||#{memDeliNo}||'%'
+			</if>
+			<if test="memName!=null and memName!=''">
+				and mem_name like '%'||#{memName}||'%'
+			</if>
+		<if test="delivery.deliStatus!=null and delivery.deliStatus!=''">
+				and deli_status like '%'||#{delivery.deliStatus}||'%'
+			</if>
+	</where>
+	</select>
+
+
+</mapper>

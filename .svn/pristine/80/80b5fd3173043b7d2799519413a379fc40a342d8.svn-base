@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.PlaceorderMapper">
+
+	<resultMap type="Placeorder" id="placeorderResultMap">
+		<id column="po_no" property="poNo"/>
+		<result column="po_order_no" property="poOrderNo"/>
+		<result column="po_emp_no" property="poEmpNo"/>
+		<result column="po_clt_no" property="poCltNo"/>
+		<result column="po_product" property="poProduct"/>
+		<result column="po_cnt" property="poCnt"/>
+		<result column="po_price" property="poPrice"/>
+		<result column="po_date" property="poDate"/>
+		<result column="po_status" property="poStatus"/>
+		<result column="po_permit" property="poPermit"/>
+		
+		<!-- collection : 1:N 관계의 테이블 조인결과를 클래스의 콜렉션 필드 요소에 매핑하기 위한 엘리먼트 -->
+		<!-- property 속성 : 콜렉션 필드명을 속성값으로 설정 -->
+		<!-- ofType 속성 : 콜렉션 필드의 요소에 대한 Java 자료형을 속성값으로 설정 -->
+		<association property="order" javaType="Order">
+			<id column="order_no" property="orderNo"/>
+			<result column="order_member_no" property="orderMemberNo"/>
+			<result column="order_status" property="orderStatus"/>
+			<result column="order_cnt" property="orderCnt"/>
+			<result column="order_date" property="orderDate"/>
+			<result column="order_product" property="orderProduct"/>
+		</association>
+		
+		<association property="employee" javaType="Employee">
+			<id column="emp_no" property="empNo"/>
+			<result column="emp_name" property="empName"/>
+			<result column="emp_regino" property="empRegino"/>
+			<result column="emp_email" property="empEmail"/>
+			<result column="emp_phone" property="empPhone"/>
+			<result column="emp_addr" property="empAddr"/>
+			<result column="emp_birth" property="empBirth"/>
+			<result column="emp_sdate" property="empSdate"/>
+			<result column="emp_edate" property="empEdate"/>
+			<result column="emp_account" property="empAccount"/>
+			<result column="emp_depart" property="empDepart"/>
+			<result column="emp_grade" property="empGrade"/>
+			<result column="emp_photo" property="empPhoto"/>
+			<result column="emp_end" property="empEnd"/>
+			<result column="emp_passwd" property="empPasswd"/>
+		</association>
+		
+		<association property="client" javaType="Client">
+			<id column="clt_no" property="cltNo"/>
+			<result column="clt_name" property="cltName"/>
+			<result column="clt_phone" property="cltPhone"/>
+			<result column="clt_admin" property="cltAdmin"/>
+			<result column="clt_location" property="cltLocation"/>
+			<result column="client_status" property="cltStatus"/>
+		</association>
+	</resultMap>
+	
+	
+	<select id="selectPlaceorderList" parameterType="Placeorder" resultMap="placeorderResultMap">
+		select po_no, po_order_no, po_emp_no, po_clt_no, po_product, po_cnt, po_price, po_date, po_status, po_permit from placeorder order by to_number(po_no)
+	</select>
+	
+	<select id="selectPoNo" parameterType="Placeorder" resultMap="placeorderResultMap">
+		select po_no, po_order_no, po_emp_no, po_clt_no, po_product, po_cnt, po_price, po_date, po_status, po_permit from placeorder where po_no = #{poNo}
+	</select>
+	
+	<select id="selectPoAutList" parameterType="Placeorder" resultMap="placeorderResultMap">
+		select po_no, po_order_no, po_emp_no, po_clt_no, po_product, po_cnt, po_price, po_date, po_status, po_permit from placeorder where po_status = 0 and po_permit = 0 order by to_number(po_no)
+	</select>
+	
+	<select id="selectPoRList" resultType="Order">
+		select order_no, order_cnt, order_product, order_date from ordermain where order_date between sysdate - 4 and sysdate and order_no not in (select o.order_no from placeorder p join ordermain o on o.order_no = p.po_order_no) order by order_no
+	</select>
+	
+	<select id="selectPoEmpList" resultType="Employee">
+		select emp_no, emp_name, emp_depart, emp_grade from employee where emp_end = 0 order by emp_no
+	</select>
+	
+	<select id="selectPoCltList" resultType="Client">
+		select clt_no, clt_name, clt_location from client where clt_status = 0 order by to_number(clt_no)
+	</select>
+	
+	<insert id="insertPlaceorder">
+		insert into placeorder values ((select nvl(max(to_number(po_no))+1,0) from placeorder), #{poOrderNo}, #{poEmpNo}, #{poCltNo}, #{poProduct}, #{poCnt}, #{poPrice}, sysdate, 0, 0)
+	</insert>
+	
+	<update id="updatePlaceorder">
+		update placeorder set po_price = #{poPrice} where po_no = #{poNo}
+	</update>
+	
+	<update id="updateApprovalPlaceorder">
+		update placeorder set po_status = 1, po_permit = 1 where po_no = #{poNo}
+	</update>
+</mapper>

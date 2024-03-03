@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwill.mapper.ReceiptMapper">
+	
+	<resultMap type="Receipt" id="receiptResultMap">
+		<id column="rcp_no" property="rcpNo"/>
+		<result column="rcp_po_no" property="rcpPoNo"/>
+		<result column="rcp_date" property="rcpDate"/>
+		<result column="rcp_cnt" property="rcpCnt"/>
+		<result column="rcp_price" property="rcpPrice"/>
+		<result column="rcp_product" property="rcpProduct"/>
+		<result column="rcp_memo" property="rcpMemo"/>
+		<result column="rcp_status" property="rcpStatus"/>
+		
+		<!-- collection : 1:N 관계의 테이블 조인결과를 클래스의 콜렉션 필드 요소에 매핑하기 위한 엘리먼트 -->
+		<!-- property 속성 : 콜렉션 필드명을 속성값으로 설정 -->
+		<!-- ofType 속성 : 콜렉션 필드의 요소에 대한 Java 자료형을 속성값으로 설정 -->
+		<association property="pdn" javaType="Placeorder">
+			<id column="po_no" property="poNo"/>
+			<result column="po_order_no" property="poOrderNo"/>
+			<result column="po_emp_no" property="poEmpNo"/>
+			<result column="po_clt_no" property="poCltNo"/>
+			<result column="po_product" property="poProduct"/>
+			<result column="po_cnt" property="poCnt"/>
+			<result column="po_price" property="poPrice"/>
+			<result column="po_date" property="poDate"/>
+			<result column="po_status" property="poStatus"/>
+			<result column="po_permit" property="poPermit"/>
+		</association>
+	</resultMap>
+	
+	
+	<select id="selectRcpList" parameterType="Receipt" resultMap="receiptResultMap">
+		select rcp_no, rcp_po_no, rcp_date, rcp_cnt, rcp_price, rcp_product, rcp_memo, rcp_status from receipt where rcp_status = 0 order by to_number(rcp_no)
+	</select>
+	
+	<select id="selectCearchRcp" parameterType="Receipt" resultMap="receiptResultMap">
+		select rcp_no, rcp_po_no, rcp_date, rcp_cnt, rcp_price, rcp_product, rcp_memo, rcp_status from receipt where rcp_no = #{rcpNo}
+	</select>
+	
+	<insert id="insertRcp">
+		insert into receipt values ((select nvl(max(to_number(rcp_no))+1,0) from receipt), #{rcpPoNo}, sysdate, #{rcpCnt}, #{rcpPrice}, #{rcpProduct}, #{rcpMemo}, 0)
+	</insert>
+	
+	<select id="selectPoList" resultType="Placeorder">
+		select po_no, po_product, po_cnt, po_price from placeorder where po_date between sysdate - 4 and sysdate and po_status = 1 and po_permit = 1 and po_no not in (select p.po_no from receipt r join placeorder p on r.rcp_po_no = p.po_no) order by to_number(po_no)
+	</select>
+</mapper>
