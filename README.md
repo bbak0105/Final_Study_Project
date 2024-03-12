@@ -38,7 +38,7 @@ public class SalesController {
 	
 	// 주간검색
 	@RequestMapping(value = "/weekSales", method = RequestMethod.GET)
-	public String displayWeek(Model model ) {
+	public String displayWeek(Model model) {
 		logger.info("selectWeekList 메소드 호출");
 		model.addAttribute("weekList", salesService.getWeekList());
 		...
