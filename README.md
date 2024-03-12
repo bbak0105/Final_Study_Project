@@ -23,6 +23,11 @@
 
 <br/>
 
+## 📌 ERD
+
+
+<br/>
+
 ## 📌 Descriptions
 ### `SalesController.java`
 > ✏️ 판매 Controller 입니다.
@@ -47,6 +52,7 @@ public class SalesController {
 	}
 }
 ```
+[↑ 전체코드보기](https://github.com/bbak0105/Final_Study_Project/blob/master/src/main/java/com/itwill/controller/SalesController.java)
 
 ---
 
@@ -66,6 +72,8 @@ public interface SalesService {
 	...
 }
 ```
+
+[↑ 전체코드보기]()
 
 ---
 
@@ -94,6 +102,8 @@ public class SalesServiceImpl implements SalesService{
 }
 ```
 
+[↑ 전체코드보기]()
+
 ---
 
 ### `SalesDAO.java`
@@ -116,6 +126,8 @@ public interface SalesDAO {
   ...
 }
 ```
+
+[↑ 전체코드보기]()
 
 ---
 
@@ -140,6 +152,8 @@ public class SalaryDAOImpl implements SalaryDAO{
 }
 ```
 
+[↑ 전체코드보기]()
+
 ---
 
 ### `SalesMapper.java`
@@ -160,6 +174,8 @@ public interface SalesMapper {
 
 }
 ```
+
+[↑ 전체코드보기]()
 
 ---
 
@@ -222,30 +238,7 @@ public interface SalesMapper {
 </select>
 
 ...
-<!-- 한달 간 총 발주량 -->
-<select id="selectTotalRelout" resultMap="salesResultMap">
-	select 
-    sum(pd_cnt) as total_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
-     (SELECT LEVEL AS LEV FROM DUAL
-     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
-</select>
-
-...
-<!-- 이번분기 매출 -->
-<select id="selectNowbunSales" resultMap="salesResultMap">
-	select sum(total_sales)nowbun_sales from
-    (select 
-    rel_date,
-    pdn_product,
-    pd_price*pd_cnt as total_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-    where rel_date between 
-    (select to_char(add_months(sysdate,-6),'yyyy-MM-dd') last_year from dual)
-    and
-    (select to_char(add_months(sysdate,0),'yyyy-MM-dd') now_month from dual))
-</select>
-...
 </mapper>
 ```
+
+[↑ 전체코드보기]()
