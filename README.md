@@ -22,7 +22,7 @@
 <br/>
 
 ## 📌 Descriptions
-### `SalesController.java`
+### `SalesController.java`
 > ✏️ 판매 Controller 입니다.
 
 ```java
