@@ -54,6 +54,7 @@ public class SalesController {
 		model.addAttribute("weekList", salesService.getWeekList());
 		...
 	}
+	return "sales/weekSales";
 }
 ```
 [↑ 전체코드보기](https://github.com/bbak0105/Final_Study_Project/blob/master/src/main/java/com/itwill/controller/SalesController.java)
