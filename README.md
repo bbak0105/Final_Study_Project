@@ -54,6 +54,7 @@ public class SalesController {
 		model.addAttribute("weekList", salesService.getWeekList());
 		...
 	}
+
 	return "sales/weekSales";
 }
 ```
