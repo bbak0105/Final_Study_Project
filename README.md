@@ -48,7 +48,7 @@ public class SalesController {
 
 ---
 
-### `SalesService.java`
+### `SalesService.java`
 > ✏️ 판매 Service Interface 입니다.
 
 ```java
@@ -67,7 +67,7 @@ public interface SalesService {
 
 ---
 
-### `SalesServiceImpl.java`
+### `SalesServiceImpl.java`
 > ✏️ 판매 Service Interface를 구현한 구현체입니다.
 
 ```java
@@ -94,7 +94,7 @@ public class SalesServiceImpl implements SalesService{
 
 ---
 
-### `SalesDAO.java`
+### `SalesDAO.java`
 > ✏️ 판매 Service DAO Interface 입니다.
 
 ```java
@@ -117,7 +117,7 @@ public interface SalesDAO {
 
 ---
 
-### `SalesServiceImpl.java`
+### `SalesDAOImpl.java`
 > ✏️ 판매 DAO Interface를 구현한 구현체입니다.
 
 ```java
