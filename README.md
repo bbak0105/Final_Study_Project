@@ -28,6 +28,10 @@
 
 <br/>
 
+## 📌 Preview
+
+<br/>
+
 ## 📌 Descriptions
 ### `SalesController.java`
 > ✏️ 판매 Controller 입니다.
