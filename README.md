@@ -25,11 +25,17 @@
 
 ## 📌 ERD
 
+<img width="947" alt="스크린샷 2024-03-12 오전 11 58 08" src="https://github.com/bbak0105/Final_Study_Project/assets/66405572/5351ebb3-a0cb-40d9-a090-979a76b8730f">
 
+<br/>
 <br/>
 
 ## 📌 Preview
 
+<img width="1420" alt="스크린샷 2024-03-12 오후 11 09 21" src="https://github.com/bbak0105/Final_Study_Project/assets/66405572/c08345cb-28bf-412c-93a2-993d054ce5f1">
+<img width="1421" alt="스크린샷 2024-03-12 오후 11 09 39" src="https://github.com/bbak0105/Final_Study_Project/assets/66405572/eedc9bfc-8767-480f-95a5-3cdf94abe4ef">
+
+<br/>
 <br/>
 
 ## 📌 Descriptions
