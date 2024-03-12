@@ -43,6 +43,11 @@
 ```
 [↑ 전체코드보기](https://github.com/bbak0105/AI_Project_Back/blob/main/TotalAnalyize.py)
 
+<br/>
+
+> 캡쳐본
+<img width="953" alt="스크린샷 2024-03-10 오후 11 25 24" src="https://github.com/bbak0105/AI_Project_Front/assets/66405572/717b8bfc-8a0c-48a5-88ab-f46c6f0254f6">
+
 ---
 
 ### `Stock Prediction`
