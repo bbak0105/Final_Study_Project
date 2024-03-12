@@ -242,3 +242,39 @@ public interface SalesMapper {
 ```
 
 [↑ 전체코드보기](https://github.com/bbak0105/Final_Study_Project/blob/master/src/main/java/com/itwill/mapper/SalesMapper.xml)
+
+---
+
+### `Sales.java`
+> ✏️ 판매 DTO 입니다.
+
+```java
+package com.itwill.dto;
+
+//출고테이블,상품테이블,생산테이블(상품명)을 조인하여 값을 뽑기 위해 만드는 dto
+public class Sales {
+	private Relout relout;
+	private Product product;
+	private Production production;
+
+	private int rawPrice;
+	private String startDate;
+	private String endDate;
+	...
+	
+	public Sales() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Relout getRelout() {
+		return relout;
+	}
+
+	public void setRelout(Relout relout) {
+		this.relout = relout;
+	}
+	...
+}
+
+```
+
