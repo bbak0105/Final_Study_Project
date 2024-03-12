@@ -1,18 +1,23 @@
-# LSTM을 활용한 재고 관리 웹 사이트 제작 (백엔드)
-![DataNomads](https://github.com/bbak0105/AI_Project_Front/assets/66405572/1d1423ee-e0a9-4a93-8072-aee69b1b261b)
+# MVC 모델을 기반으로 Spring Framewok을 활용한 ERP 웹 사이트 제작
+
+<img width="1393" alt="스크린샷 2024-03-12 오후 12 19 57" src="https://github.com/bbak0105/Final_Study_Project/assets/66405572/0587d837-217f-495c-9c93-d3e9830ea704">
 
 <br/>
 
 ## 📌 Backend Skills
 ### Language
-<a><img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/></a>
+<a><img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/></a>
+<a><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white"/></a>
+
+### Framework
+<a><img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white"/></a>
 
 ### IDE
-<a><img src="https://img.shields.io/badge/PyCharm-000000.svg?&style=for-the-badge&logo=PyCharm&logoColor=white"/></a>
+<a><img src="https://img.shields.io/badge/Eclipse-2C2255?style=for-the-badge&logo=eclipse&logoColor=white"/></a>
 
 ### Skills
-<a><img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white"/></a>
-<a><img src="https://img.shields.io/badge/ScikitLearn-FF9900?style=for-the-badge"/></a>
+<a><img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white"/></a>
+<a><img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white"/></a>
 
 <br/>
 
