@@ -222,68 +222,6 @@ public interface SalesMapper {
 </select>
 
 ...
-<!-- 주간매출 -->
-<select id="selectWeekList" resultMap="salesResultMap" parameterType="Sales">
-   select 
-   rel_date,
-   pdn_product,
-   pd_cnt, 
-   rel_price*rel_cnt as raw_price,
-   pd_price*pd_cnt as total_sales, 
-   (pd_price*pd_cnt)-(rel_price*rel_cnt) as pure_sales 
-   from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-   where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
-   order by rel_date
-</select>
-
-<!-- 주간매출 -->
-<!-- 주간매출 : 주간최대매출 -->
-<select id="selectWeekMax" resultMap="salesResultMap">
-    select * from(select 
-    rel_date,
-    pdn_product,
-    pd_price*pd_cnt as total_sales,
-    sum(pd_price*pd_cnt) over(partition by rel_date) maxi_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
-    order by maxi_sales desc)
-  <![CDATA[where rownum<=1]]>
-</select>
-
-<!-- 주간매출 : 주간총매출 -->
-<select id="selectWeekEntire" resultMap="salesResultMap">
-    select sum(total_sales)entire_sales from
-    (select 
-    rel_date,
-    pdn_product,
-    pd_price*pd_cnt as total_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
-    order by rel_date desc)
-</select>
-
-<!-- 주간매출 : 주간평균매출 -->
-<select id="selectWeekAvg" resultMap="salesResultMap">
-	select round(avg(total_sales))avg_sales from
-    (select 
-    rel_date,
-    pdn_product,
-    pd_price*pd_cnt as total_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-    where rel_date between to_char(sysdate-7,'yyyy-MM-dd') and to_char(sysdate,'yyyy-MM-dd')
-    order by rel_date desc)
-</select>
-...
-
-<!-- 한달 간 총 주문수 -->
-<select id="selectTotalOrder" resultMap="salesResultMap">
- 	select count(*) as total_sales
-    from relout
-     where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
-     (SELECT LEVEL AS LEV FROM DUAL
-     <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
-</select>
-
 <!-- 한달 간 총 발주량 -->
 <select id="selectTotalRelout" resultMap="salesResultMap">
 	select 
@@ -294,21 +232,7 @@ public interface SalesMapper {
      <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
 </select>
 
-<!-- 이번달 매출 -->
-<select id="selectNowmonthSales" resultMap="salesResultMap">
-  select sum(total_sales)nowmonth_sales from
-    (select 
-    rel_date,
-    pdn_product,
-    pd_price*pd_cnt as total_sales
-    from Production inner join Product on pdn_no = pd_pdn_no inner join Relout on pdn_rel_no = rel_no
-    where rel_date IN (SELECT TRUNC (SYSDATE, 'MM') + LEV - 1 AS THIS_MONTH FROM 
-    (SELECT LEVEL AS LEV FROM DUAL
-    <![CDATA[CONNECT BY LEVEL <= TO_CHAR (LAST_DAY (SYSDATE), 'DD')]]>))
-    order by rel_date desc)
-</select>
 ...
-
 <!-- 이번분기 매출 -->
 <select id="selectNowbunSales" resultMap="salesResultMap">
 	select sum(total_sales)nowbun_sales from
